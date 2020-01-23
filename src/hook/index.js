@@ -1,28 +1,19 @@
-import React, { useState, useEffect } from 'react';
-
-const Fruitlist = ['banana', 'apple', 'strawberry'];
+import React from 'react';
+import { useHookStatus } from './useHook'
 
 export default function Hook (props) {
-  const [count, setCount] = useState(0);
-  const [fruit, setFruit] = useState(0);
-
-  useEffect(() => {
-    document.title = `${count} ${Fruitlist[fruit]}`
-  });
-
-  function nextFruit(){
-    // updating state based on previous state
-    setFruit(fruit => (fruit + 1) % Fruitlist.length);
-  }
+  // Only call Hook at the top level.
+  // Only call Hook from React function components.
+  const {count, fruit} = useHookStatus()
 
   return (
     <div>
-      <p>Clicked: { count } times</p>
-      <button onClick={() => setCount(count + 1)}>
+      <p>Clicked: { count.value } times</p>
+      <button onClick={() => count.update(count + 1)}>
         Click me
       </button>
-      <p>Your fruit: { Fruitlist[fruit] } </p>
-      <button onClick={ nextFruit }>
+      <p>Your fruit: { fruit.value } </p>
+      <button onClick={ fruit.update }>
         Click me
       </button>
     </div>
