@@ -9,7 +9,7 @@ export default function Hook (props) {
   return (
     <div>
       <p>Clicked: { count.value } times</p>
-      <button onClick={() => count.update(count + 1)}>
+      <button onClick={() => count.update(count.value + 1)}>
         Click me
       </button>
       <p>Your fruit: { fruit.value } </p>

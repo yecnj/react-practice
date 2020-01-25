@@ -12,10 +12,6 @@ export function useHookStatus(){
     document.title = `${count} ${Fruitlist[fruit]}`
   });
 
-  function nextCount(){
-    setCount(count => count + 1);
-  }
-
   function nextFruit(){
     setFruit(fruit => (fruit + 1) % Fruitlist.length);
   }
@@ -23,7 +19,7 @@ export function useHookStatus(){
   return {
     "count": {
       "value": count,
-      "update": nextCount
+      "update": setCount
     },
     "fruit": {
       "value": Fruitlist[fruit],
