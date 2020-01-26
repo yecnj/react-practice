@@ -8,11 +8,12 @@ function ThemeToggleButton(props){
 }
 
 class ThemedLayout extends React.Component {
-  static contextType = ThemeContext;
   render() {
     return (
       <div>
-        <h1>{ this.context.theme }</h1>
+        <ThemeContext.Consumer>
+          { context =>  <h1>{ context.theme }</h1> }
+        </ThemeContext.Consumer>
         <ThemeToggleButton/>
       </div>
     );
