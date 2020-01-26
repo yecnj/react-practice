@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { ThemeContext } from './context';
+import { ThemeContext, UserContext } from './context';
 import { useThemeStatus } from './useTheme';
 
 function ThemeToggleButton(props){
@@ -8,12 +8,14 @@ function ThemeToggleButton(props){
 }
 
 class ThemedLayout extends React.Component {
+  static contextType = UserContext;
   render() {
     return (
       <div>
         <ThemeContext.Consumer>
           { context =>  <h1>{ context.theme }</h1> }
         </ThemeContext.Consumer>
+        <h1>{ this.context }</h1>
         <ThemeToggleButton/>
       </div>
     );
@@ -23,8 +25,10 @@ class ThemedLayout extends React.Component {
 export default function Context(props){
   const status = useThemeStatus();
   return (
-    <ThemeContext.Provider value={ status }>
-      <ThemedLayout/>
-    </ThemeContext.Provider>
+    <UserContext.Provider value={ 'root' }>
+      <ThemeContext.Provider value={ status }>
+        <ThemedLayout/>
+      </ThemeContext.Provider>
+    </UserContext.Provider>
   )
 }
