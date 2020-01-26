@@ -13,3 +13,8 @@ export function useThemeStatus(){
     toggle: nextTheme
   }
 }
+
+export function useUserStatus(){
+  const [user, setUser] = useState('guest');
+  return [user, setUser]
+}

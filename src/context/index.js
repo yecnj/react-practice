@@ -1,10 +1,15 @@
 import React, { useContext } from 'react';
 import { ThemeContext, UserContext } from './context';
-import { useThemeStatus } from './useTheme';
+import { useThemeStatus, useUserStatus } from './useTheme';
 
 function ThemeToggleButton(props){
   const context = useContext(ThemeContext)
   return <button onClick={context.toggle}>change</button>;
+}
+
+function UserRootButton(props){
+  const { setUser } = useContext(UserContext);
+  return <button onClick={() => setUser('root')}>change root</button>
 }
 
 class ThemedLayout extends React.Component {
@@ -15,8 +20,9 @@ class ThemedLayout extends React.Component {
         <ThemeContext.Consumer>
           { context =>  <h1>{ context.theme }</h1> }
         </ThemeContext.Consumer>
-        <h1>{ this.context }</h1>
         <ThemeToggleButton/>
+        <h1>{ this.context.user }</h1>
+        <UserRootButton/>
       </div>
     );
   }
@@ -24,8 +30,9 @@ class ThemedLayout extends React.Component {
 
 export default function Context(props){
   const status = useThemeStatus();
+  const [user, setUser] = useUserStatus();
   return (
-    <UserContext.Provider value={ 'root' }>
+    <UserContext.Provider value={ { user, setUser } }>
       <ThemeContext.Provider value={ status }>
         <ThemedLayout/>
       </ThemeContext.Provider>
