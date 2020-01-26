@@ -3,8 +3,11 @@ import { ThemeContext, UserContext } from './context';
 import { useThemeStatus, useUserStatus } from './useTheme';
 
 function ThemeToggleButton(props){
-  const context = useContext(ThemeContext)
-  return <button onClick={context.toggle}>change</button>;
+  const context = useContext(ThemeContext);
+  const { user } = useContext(UserContext);
+  return <button onClick={() => {
+    if (user === 'root') context.toggle();
+  }}>change</button>;
 }
 
 function UserRootButton(props){
