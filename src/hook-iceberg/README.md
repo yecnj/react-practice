@@ -122,6 +122,72 @@ export default function Level03() {
 
 다만, 리소스 낭비가 해결되었을 뿐 `count`는 1로 변한채 계속 유지됩니다.
 
+## Level 05: use `count` as dependency ([Contditionally firing an effect](https://reactjs.org/docs/hooks-reference.html#conditionally-firing-an-effect))
+ 
+
+```javascript
+...
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCount(count + 1);
+    }, 500);
+    return () => clearInterval(interval);
+  }, [count]);
+
+...
+```
+앞서 사용했던 `useEffect`의 두번째 인수는 `DependencyList`로 각 Dependency가 업데이트 될때마다 clean-up function과 새로운 `useEffect`가 호출됩니다.
+
+이 코드는 버그없이 작동합니다. 하지만, `setInterval`이 500ms 마다 폐기와 생성을 반복한다는 점에서 완벽한 코드는 아닙니다.
+
+## Level 06: setTimeout
+```javascript
+...
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setCount(count + 1);
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [count]);
+
+...
+```
+Level 5의 코드와 마찬가지로 정상적으로 작동합니다. `count`가 바뀔때마다 `useEffect`가 호출되고 `setTimeout`과 `setInteval`은 똑같이 작동해냅니다.
+
+하지만, React에는 이 둘보다 더 나은 해결방안이 있습니다.
+
+## Level 07: [functional update](https://reactjs.org/docs/hooks-reference.html#functional-updates) for useState
+```javascript
+...
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCount(c => c + 1);
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
+
+...
+```
+`useState`의 `functional update`를 이용하면 함수 실행시 값, 즉 이전 상태를 기준으로 다음 상태를 결정할 수 있습니다.
+
+`DependencyList`가 비어있기 때문에 `clearInterval`은 컴포넌트 마운트 해제시에만 작동하고, `useEffect` 역시 컴포넌트 마운트시 단 한번만 작동합니다.
+
+따라서, 이 코드는 우리가 원하는대로 정확하게 작동합니다.
+
+```powershell
+./src/hook-iceberg/levels/level03.js
+  Line 10:6:  React Hook useEffect has a missing dependency: 'count'. Either include it or remove the dependency array. You can also do a functional update 'setCount(c => ...)' if you only need 'count' in
+the 'setCount' call  react-hooks/exhaustive-deps
+```
+앞서 작성된 `Level 3, 4`에서 위의 Warning이 나타나는데요. 각각 `Level 6, 7`에 해당되는 
+내용입니다.
+
+1. count를 DependencyList에 추가하거나 DependencyList를 제거하세요.
+2. setCount에서만 count를 사용할 경우 functioinal update를 사용하세요.
+
 
 
 * * * 
