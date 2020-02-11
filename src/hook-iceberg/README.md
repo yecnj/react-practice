@@ -126,6 +126,7 @@ export default function Level03() {
  
 
 ```javascript
+// levels/level05.js
 ...
 
   useEffect(() => {
@@ -143,6 +144,7 @@ export default function Level03() {
 
 ## Level 06: setTimeout
 ```javascript
+// levels/level06.js
 ...
 
   useEffect(() => {
@@ -160,6 +162,7 @@ Level 5의 코드와 마찬가지로 정상적으로 작동합니다. `count`가
 
 ## Level 07: [functional update](https://reactjs.org/docs/hooks-reference.html#functional-updates) for useState
 ```javascript
+// levels/level07.js
 ...
 
   useEffect(() => {
@@ -182,12 +185,191 @@ Level 5의 코드와 마찬가지로 정상적으로 작동합니다. `count`가
   Line 10:6:  React Hook useEffect has a missing dependency: 'count'. Either include it or remove the dependency array. You can also do a functional update 'setCount(c => ...)' if you only need 'count' in
 the 'setCount' call  react-hooks/exhaustive-deps
 ```
-앞서 작성된 `Level 3, 4`에서 위의 Warning이 나타나는데요. 각각 `Level 6, 7`에 해당되는 
-내용입니다.
+앞서 작성된 `Level 3, 4`에서 위의 Warning이 나타나는데요. 각각 `Level 6, 7`에 해당되는 내용입니다.
 
 1. count를 DependencyList에 추가하거나 DependencyList를 제거하세요.
 2. setCount에서만 count를 사용할 경우 functioinal update를 사용하세요.
 
+## Level 08: local variable
+```javascript
+// levels/level08.js
+import React, { useState } from 'react';
+
+export default function Level08() {
+  const [count, setCount] = useState(0);
+  let interval = null;
+
+  const start = () => {
+    interval = setInterval(() => {
+      setCount(c => c + 1);
+    }, 500);
+  };
+  const stop = () => {
+    clearInterval(interval);
+  };
+
+  return (
+    <div>
+      count => {count}
+      <button onClick={start}>start</button>
+      <button onClick={stop}>stop</button>
+    </div>
+  );
+}
+```
+`start`와 `stop` 버튼을 구현했습니다.
+
+`start` 버튼에 의해서 시작되기 때문에 `useEffect`는 사라졌습니다. `start`는 앞서 구현한대로 `interval`을 생성하고, `stop`은 `clearinterval`을 실행합니다.
+
+하지만 이 코드는 정상적으로 작동하지 않습니다. Render 시에 새로운 Reference가 생성되기 때문에, `stop`함수는 null을 참조하게됩니다.
+
+마찬가지로, `start`함수가 여러번 호출되면 그만큼 `setInterval`도 누적되는 버그가 있습니다.
+
+## Level 09: [useRef](https://reactjs.org/docs/hooks-reference.html#useref)
+```javascript
+// levels/level09.js
+import React, { useState, useRef } from 'react';
+
+export default function Level09() {
+  const [count, setCount] = useState(0);
+  const intervalRef = useRef(null);
+
+  const start = () => {
+    intervalRef.current = setInterval(() => {
+      setCount(c => c + 1);
+    }, 500);
+  };
+  const stop = () => {
+    clearInterval(intervalRef.current);
+  };
+  
+  return (
+    <div>
+      count => {count}
+      <button onClick={start}>start</button>
+      <button onClick={stop}>stop</button>
+    </div>
+  );
+}
+```
+`useRef`를 사용하면 `local variable`과는 다르게 같은 변수를 계속해서 참조할 수 있습니다.
+
+다음은 `start`함수를 여러번 호출할 때 interval이 겹치는 문제를 해결해야합니다.
+
+## Level 10: useCallback
+```javascript
+// levels/level10.js
+...
+  const start = () => {
+    if (intervalRef.current !== null) {
+      return;
+    }
+    ...
+  };
+  const stop = () => {
+    if (intervalRef.current === null) {
+      return;
+    }
+    ...
+  };
+...
+```
+`start`의 시작시 간격이 이미 생성된 경우, `stop`의 시작시 간격이 이미 없는 경우를 체크해 바로 함수를 끝냄으로써 리소스 낭비를 피했습니다. 다만, 성능에 문제가 조금 있습니다.
+
+[memoization](https://medium.com/@sdolidze/react-hooks-memoization-99a9a91c8853)은 React에서 자주 사용하는 성능 최적화 도구입니다. `React.memo`는 얕은 비교(shallow comparison)를 수행한 뒤, 레퍼런스가 같으면 랜더링을 건너뜁니다. `start`와 `stop`이 `memoized` component에 전달되면 매 랜더링마다 새로운 참조가 리턴되기때문에 최적화에 실패합니다.
+
+## Level 11: [useCallback](https://reactjs.org/docs/hooks-reference.html#usecallback)
+```javascript
+// levels/level11.js
+import React, { useState, useRef } from 'react';
+
+export default function Level11() {
+  const [count, setCount] = useState(0);
+  const intervalRef = useRef(null);
+
+  const start = useCallback(() => {
+    if (intervalRef.current !== null) {
+      return;
+    }
+    intervalRef.current = setInterval(() => {
+      setCount(c => c + 1);
+    }, 500);
+  }, []);
+
+  const stop = useCallback(() => {
+    if (intervalRef.current === null) {
+      return;
+    }
+    clearInterval(intervalRef.current);
+    intervalRef.current = null;
+  }, []);
+
+  return (
+    <div>
+      count => {count}
+      <button onClick={start}>start</button>
+      <button onClick={stop}>stop</button>
+    </div>
+  );
+}
+```
+`useCallback`을 이용해서 함수를 작성하면 랜더링 후에도 같은 레퍼런스를 줄 수 있습니다. 
+
+이 코드의 경우 정상적으로 작동하며 리소스 낭비도 없고 성능에도 문제가 없지만, 고작 카운터 구현에 많고 복잡한 코드가 작성되고 말았습니다.
+
+## Level 12: [Custom hook](https://reactjs.org/docs/hooks-custom.html#using-a-custom-hook)
+```javascript
+// levels/useCounter.js
+import { useState, useRef, useCallback } from 'react';
+
+export default function useCounter(initialValue) {
+  const [count, setCount] = useState(initialValue);
+  const intervalRef = useRef(null);
+
+  const start = useCallback(() => {
+    if (intervalRef.current !== null) {
+      return;
+    }
+    intervalRef.current = setInterval(() => {
+      setCount(c => c + 1);
+    }, 500);
+  }, []);
+
+  const stop = useCallback(() => {
+    if (intervalRef.current === null) {
+      return;
+    }
+    clearInterval(intervalRef.current);
+    intervalRef.current = null;
+  }, []);
+
+  const reset = useCallback(() => {
+    setCount(0);
+  }, []);
+
+  return { count, start, stop, reset };
+}
+
+```
+
+```javascript
+// levels/level12.js
+import React from 'react';
+import useCounter from './useCounter';
+
+export default function Level12() {
+  const { count, start, stop, reset } = useCounter(0);
+  return (
+    <div>
+      count => {count}
+      <button onClick={start}>start</button>
+      <button onClick={stop}>stop</button>
+      <button onClick={reset}>reset</button>
+    </div>
+  );
+}
+```
+Custom hook을 통해서 코드를 정리했습니다. 이 카운터는 이제 재사용도 가능합니다.
 
 
 * * * 
