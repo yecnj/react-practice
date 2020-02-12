@@ -371,6 +371,39 @@ export default function Level12() {
 ```
 Custom hook을 통해서 코드를 정리했습니다. 이 카운터는 이제 재사용도 가능합니다.
 
+## React Hooks Radar
+### :white_check_mark: Green
+Green hook들은 최신 React를 위한 메인 블록입니다. 큰 고민하고 사용하지 않아도 좋습니다.
+* useReducer
+* useState
+* useContext
+
+### :full_moon: Yellow
+Yellow hook들은 `memoization`을 사용하여 유용한 성능 최적화를 제공합니다.  
+다만, 라이프사이클과 입력은 주의해서 관리해야합니다.
+* useCallback
+* useMemo
+
+### :red_circle: Red
+Red hook들은 `Side effect`를 사용해 변수들과 상호작용합니다. 매우 강력하지만 그만큼 주의해서 사용해야합니다. `Custom Hooks`는 non-trivial한 케이스에 모두 권장됩니다.
+* useRef
+* useEffect
+* useLayoutEffect
+
+## React Hooks Checklist
+1. [Hook 규칙](https://ko.reactjs.org/docs/hooks-rules.html)을 준수하세요.
+2. 메인 렌더링 함수에서 직접 Side effect를 생성하지 마세요.
+3. 사용했던 리소스는 모두 구독 취소, 삭제, 파기하세요.
+4. 동일한 값을 읽고쓰는걸 막기 위해서는 `useState` 대신 `useReducer` 또는 `functional update`를 사용하세요.
+5. 메인 랜더링 함수안에서 직접 변수를 사용하지말고 `useRef`를 사용하세요.
+6. `uesRef`에서 사용한 값이 컴포넌트보다 짧은 라이프사이클을 가지기 때문에, 리소스를 파기할때 값을 해제하는것을 잊지마세요.
+7. 무한재귀와 리소스 낭비에 주의하세요.
+8. 성능향상이 필요한경우 함수나 객체를 `Memoize`하세요.
+9. `dependency list`를 정확하게 작성하세요.
+    * `undefiend` &rarr; 매 랜더링 마다
+    * `[a, b]` &rarr; a 또는 b가 변경될 때
+    * `[]` &rarr; 랜더링 이후 한 번만
+10. non-trivial한 케이스에는 `Custom Hooks`를 사용하세요.
 
 * * * 
 ## 출처
