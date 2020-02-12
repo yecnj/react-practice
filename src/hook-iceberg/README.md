@@ -1,4 +1,5 @@
 # The Iceberg of React Hooks
+> 원글: https://medium.com/@sdolidze/the-iceberg-of-react-hooks-af0b588f43fb 
 
 ## 소개
 React Hooks는 클래스 컴포넌트와 다르게 기본적인 코드만으로 어플리케이션에 필요한 요소 구성, 코드의 재사용 등을 간단하게 이뤄냅니다.
@@ -56,9 +57,9 @@ export default function Level01() {
 위 코드는 500ms마다 카운터를 올리기 위해 작성되었습니다.   
 하지만, 의도와는 다르게 랜더링이 발생할 때마다 새로운 인터벌이 작성됩니다.  
 
-함수형 컴포넌트 자체에서는 뮤테이션, 구독, 타이머, 로깅 및 기타 Side effect가 허용되지 않습니다([UseEffect](https://reactjs.org/docs/hooks-reference.html#useeffect, "useeffect link"))
+함수형 컴포넌트 자체에서는 뮤테이션, 구독, 타이머, 로깅 및 기타 Side effect가 허용되지 않습니다([UseEffect](https://ko.reactjs.org/docs/hooks-reference.html#useeffect))
 
-## Level 02: [UseEffect](https://reactjs.org/docs/hooks-reference.html#useeffect, "useeffect link")
+## Level 02: [UseEffect](https://ko.reactjs.org/docs/hooks-reference.html#useeffect)
 ```javascript
 // levels/level02.js
 import React, { useState, useEffect } from 'react';
@@ -75,10 +76,10 @@ export default function Level02() {
   return <div>count => {count}</div>;
 }
 ```
-대부분의 Side effect는 [UseEffect](https://reactjs.org/docs/hooks-reference.html#useeffect, "useeffect link") 내에서 행해집니다. 하지만 이 코드도 랜더링이 발생할 때마다 새로운 인터벌이 작성되고, 결과적으로 리소스 낭비가 일어납니다.
+대부분의 Side effect는 [UseEffect](https://ko.reactjs.org/docs/hooks-reference.html#useeffect) 내에서 행해집니다. 하지만 이 코드도 랜더링이 발생할 때마다 새로운 인터벌이 작성되고, 결과적으로 리소스 낭비가 일어납니다.
 
 
-## Level 03: run only once ([Timing of Effect](https://reactjs.org/docs/hooks-reference.html#timing-of-effects))
+## Level 03: run only once ([effect 타이밍](https://ko.reactjs.org/docs/hooks-reference.html#timing-of-effects))
 ```javascript
 // levels/level03.js
 import React, { useState, useEffect } from 'react';
@@ -103,7 +104,7 @@ export default function Level03() {
 또한, 이 코드는 컴포넌트를 마운트 해제한 이후에도 계속해서 `setCount`가 호출되는 리소스 낭비가 있습니다.
 
 
-## Level 04: cleanup ([Cleaning up an effect](https://reactjs.org/docs/hooks-reference.html#cleaning-up-an-effect))
+## Level 04: cleanup ([effect 정리](https://ko.reactjs.org/docs/hooks-reference.html#cleaning-up-an-effect))
 ```javascript
 // levels/level04.js
 ...
@@ -122,7 +123,7 @@ export default function Level03() {
 
 다만, 리소스 낭비가 해결되었을 뿐 `count`는 1로 변한채 계속 유지됩니다.
 
-## Level 05: use `count` as dependency ([Contditionally firing an effect](https://reactjs.org/docs/hooks-reference.html#conditionally-firing-an-effect))
+## Level 05: use `count` as dependency ([조건부 effect 발생](https://ko.reactjs.org/docs/hooks-reference.html#conditionally-firing-an-effect))
  
 
 ```javascript
@@ -160,7 +161,7 @@ Level 5의 코드와 마찬가지로 정상적으로 작동합니다. `count`가
 
 하지만, React에는 이 둘보다 더 나은 해결방안이 있습니다.
 
-## Level 07: [functional update](https://reactjs.org/docs/hooks-reference.html#functional-updates) for useState
+## Level 07: [functional update(함수적 갱신)](https://ko.reactjs.org/docs/hooks-reference.html#functional-updates) for useState
 ```javascript
 // levels/level07.js
 ...
@@ -225,7 +226,7 @@ export default function Level08() {
 
 마찬가지로, `start`함수가 여러번 호출되면 그만큼 `setInterval`도 누적되는 버그가 있습니다.
 
-## Level 09: [useRef](https://reactjs.org/docs/hooks-reference.html#useref)
+## Level 09: [useRef](https://ko.reactjs.org/docs/hooks-reference.html#useref)
 ```javascript
 // levels/level09.js
 import React, { useState, useRef } from 'react';
@@ -278,7 +279,7 @@ export default function Level09() {
 
 [memoization](https://medium.com/@sdolidze/react-hooks-memoization-99a9a91c8853)은 React에서 자주 사용하는 성능 최적화 도구입니다. `React.memo`는 얕은 비교(shallow comparison)를 수행한 뒤, 레퍼런스가 같으면 랜더링을 건너뜁니다. `start`와 `stop`이 `memoized` component에 전달되면 매 랜더링마다 새로운 참조가 리턴되기때문에 최적화에 실패합니다.
 
-## Level 11: [useCallback](https://reactjs.org/docs/hooks-reference.html#usecallback)
+## Level 11: [useCallback](https://ko.reactjs.org/docs/hooks-reference.html#usecallback)
 ```javascript
 // levels/level11.js
 import React, { useState, useRef } from 'react';
@@ -317,7 +318,7 @@ export default function Level11() {
 
 이 코드의 경우 정상적으로 작동하며 리소스 낭비도 없고 성능에도 문제가 없지만, 고작 카운터 구현에 많고 복잡한 코드가 작성되고 말았습니다.
 
-## Level 12: [Custom hook](https://reactjs.org/docs/hooks-custom.html#using-a-custom-hook)
+## Level 12: [Custom hook](https://ko.reactjs.org/docs/hooks-custom.html#using-a-custom-hook)
 ```javascript
 // levels/useCounter.js
 import { useState, useRef, useCallback } from 'react';
